@@ -11,7 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->setSceneRect(0, 0, 800, 600);
-    scene->addItem(new ResizableRectItem(QRectF(100, 100, 200, 180)));
+    QGraphicsRectItem *item = new ResizableRectItem(QRectF(0, 0, 100, 80));
+    scene->addItem(item);
+    item->setPos(100, 100);
 }
 
 MainWindow::~MainWindow()
