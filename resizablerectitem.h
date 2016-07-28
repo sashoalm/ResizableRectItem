@@ -27,6 +27,8 @@ private:
     struct {
         bool left, top, right, bottom;
     } resizeDirections;
+
+    void resizeRect(QGraphicsSceneMouseEvent *event);
 };
 
 #endif // RESIZABLERECTITEM_H

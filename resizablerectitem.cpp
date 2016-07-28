@@ -31,7 +31,17 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void ResizableRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     qDebug() << "move" << event->pos() << event->lastPos() << event->scenePos() << event->lastScenePos();
+    resizeRect(event);
+}
 
+void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << "release" << event->pos() << event->lastPos() << event->scenePos() << event->lastScenePos();
+    resizeRect(event);
+}
+
+void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
+{
     prepareGeometryChange();
 
     QPointF delta = event->pos() - event->lastPos();
@@ -46,9 +56,4 @@ void ResizableRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     } else if (resizeDirections.bottom) {
         setRect(rect().adjusted(0, 0, 0, delta.y()));
     }
-}
-
-void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    qDebug() << "release" << event->pos() << event->lastPos() << event->scenePos() << event->lastScenePos();
 }
