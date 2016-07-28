@@ -28,6 +28,8 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     // If not a resize event, pass it to base class so move event can be implemented.
     if (!resizeDirections.any()) {
         QGraphicsRectItem::mousePressEvent(event);
+    } else {
+        lastResizePos = event->pos();
     }
 }
 
@@ -53,8 +55,6 @@ void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 {
-    prepareGeometryChange();
-
     // The qBound() is used for enforcement of the minimum and maximum sizes.
     // It's derived after solving the following inequalities (example is for
     // left-resizing):
@@ -70,30 +70,57 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
     //
     // Ditto for the other 3 directions.
 
-    QPointF delta = event->pos() - event->lastPos();
+    prepareGeometryChange();
+
+    QPointF delta = event->pos() - lastResizePos;
+    bool wasUpdated = false;
     if (resizeDirections.left) {
         delta.setX(qBound(rect().width() - maximumSize().width(),
                           delta.x(),
                           rect().width() - minimumSize().width()));
-        setPos(QPointF(pos().x() + delta.x(), pos().y()));
-        setRect(rect().adjusted(0, 0, -delta.x(), 0));
+        if (delta.x() != 0) {
+            setPos(QPointF(pos().x()+delta.x(), pos().y()));
+            setRect(rect().adjusted(0, 0, -delta.x(), 0));
+        }
     } else if (resizeDirections.right) {
         delta.setX(qBound(minimumSize().width() - rect().width(),
                           delta.x(),
                           maximumSize().width() - rect().width()));
-        setRect(rect().adjusted(0, 0, delta.x(), 0));
+        if (delta.x() != 0) {
+            wasUpdated = true;
+            setRect(rect().adjusted(0, 0, delta.x(), 0));
+        }
+    } else {
+        // This is needed for lastResizePos to work correctly.
+        delta.setX(0);
     }
 
     if (resizeDirections.top) {
         delta.setY(qBound(rect().height() - maximumSize().height(),
                           delta.y(),
                           rect().height() - minimumSize().height()));
-        setPos(QPointF(pos().x(), pos().y()+delta.y()));
-        setRect(rect().adjusted(0, 0, 0, -delta.y()));
+        if (delta.y() != 0) {
+            setPos(QPointF(pos().x(), pos().y()+delta.y()));
+            setRect(rect().adjusted(0, 0, 0, -delta.y()));
+        }
     } else if (resizeDirections.bottom) {
         delta.setY(qBound(minimumSize().height() - rect().height(),
                           delta.y(),
                           maximumSize().height() - rect().height()));
-        setRect(rect().adjusted(0, 0, 0, delta.y()));
+        if (delta.y() != 0) {
+            wasUpdated = true;
+            setRect(rect().adjusted(0, 0, 0, delta.y()));
+        }
+    } else {
+        // This is needed for lastResizePos to work correctly.
+        delta.setY(0);
+    }
+
+    if (wasUpdated) {
+        // I'm using relative coordinates to move the last resize pos,
+        // though I could probably simplify things by just remembering
+        // the click-origin point, the original rect, and then using that
+        // to calculate how much to add to each side.
+        lastResizePos += delta;
     }
 }

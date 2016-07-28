@@ -37,6 +37,14 @@ private:
 
     QSizeF mMinimumSize;
     QSizeF mMaximumSize;
+
+    // The last position under which we actually resized. We use that to avoid
+    // the nasty effect where the cursor moves to the right, past the maximum
+    // size, the rect stops resizing, and then as soon as the cursor reverses
+    // direction to the left, the item starts shrinking.
+    // We want the mouse cursor to be always at the same distance from the
+    // side(s) which are being resized.
+    QPointF lastResizePos;
 };
 
 #endif // RESIZABLERECTITEM_H
