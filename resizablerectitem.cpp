@@ -55,47 +55,43 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 {
     prepareGeometryChange();
 
-    // The code can probably be drastically simplified, especially the minimum
-    // and maximum size enforcement. But this works OK for now.
+    // The qBound() is used for enforcement of the minimum and maximum sizes.
+    // It's derived after solving the following inequalities (example is for
+    // left-resizing):
+    //
+    // newWidth = oldWidth - deltaX (remember when adding +10 to the left border, the width decreases)
+    // minimumWidth <= newWidth <= maximumWidth
+    // minimumWidth <= oldWidth - deltaX <= maximumWidth
+    // minimumWidth - oldWidth <= (-deltaX) <= maximumWidth - oldWidth
+    // Reverting the sign reverts the inequality - if a<=b then -a>=-b:
+    // -(minimumWidth - oldWidth) >= -(-deltaX) >= -(maximumWidth - oldWidth)
+    // Which is equivalent to:
+    // oldWidth-maximumWidth <= deltaX <= oldWidth-minimumWidth
+    //
+    // Ditto for the other 3 directions.
 
     QPointF delta = event->pos() - event->lastPos();
     if (resizeDirections.left) {
-        setRect(rect().adjusted(delta.x(), 0, 0, 0));
-
-        // Enforce minimum/maximum size.
-        if (rect().width() < mMinimumSize.width()) {
-            setRect(rect().adjusted(rect().width()-mMinimumSize.width(), 0, 0, 0));
-        } else if (rect().width() > mMaximumSize.width()) {
-            setRect(rect().adjusted(rect().width()-mMaximumSize.width(), 0, 0, 0));
-        }
+        qreal dx = qBound(rect().width() - maximumSize().width(),
+                          delta.x(),
+                          rect().width() - minimumSize().width());
+        setRect(rect().adjusted(dx, 0, 0, 0));
     } else if (resizeDirections.right) {
-        setRect(rect().adjusted(0, 0, delta.x(), 0));
-
-        // Enforce minimum/maximum size.
-        if (rect().width() < mMinimumSize.width()) {
-            setRect(rect().adjusted(0, 0, -(rect().width()-mMinimumSize.width()), 0));
-        } else if (rect().width() > mMaximumSize.width()) {
-            setRect(rect().adjusted(0, 0, -(rect().width()-mMaximumSize.width()), 0));
-        }
+        qreal dx = qBound(minimumSize().width() - rect().width(),
+                          delta.x(),
+                          maximumSize().width() - rect().width());
+        setRect(rect().adjusted(0, 0, dx, 0));
     }
 
     if (resizeDirections.top) {
-        setRect(rect().adjusted(0, delta.y(), 0, 0));
-
-        // Enforce minimum/maximum size.
-        if (rect().height() < mMinimumSize.height()) {
-            setRect(rect().adjusted(0, rect().height()-mMinimumSize.height(), 0, 0));
-        } else if (rect().height() > mMaximumSize.height()) {
-            setRect(rect().adjusted(0, rect().height()-mMaximumSize.height(), 0, 0));
-        }
+        qreal dy = qBound(rect().height() - maximumSize().height(),
+                          delta.y(),
+                          rect().height() - minimumSize().height());
+        setRect(rect().adjusted(0, dy, 0, 0));
     } else if (resizeDirections.bottom) {
-        setRect(rect().adjusted(0, 0, 0, delta.y()));
-
-        // Enforce minimum/maximum size.
-        if (rect().height() < mMinimumSize.height()) {
-            setRect(rect().adjusted(0, 0, 0, -(rect().height()-mMinimumSize.height())));
-        } else if (rect().height() > mMaximumSize.height()) {
-            setRect(rect().adjusted(0, 0, 0, -(rect().height()-mMaximumSize.height())));
-        }
+        qreal dy = qBound(minimumSize().height() - rect().height(),
+                          delta.y(),
+                          maximumSize().height() - rect().height());
+        setRect(rect().adjusted(0, 0, 0, dy));
     }
 }
