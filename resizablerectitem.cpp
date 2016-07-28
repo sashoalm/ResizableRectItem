@@ -121,7 +121,8 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
         // with it, preserving their distance relative to the top-left corner
         // of the rectangle, because this is the most-expected behavior from a
         // user's point of view.
-        setPos(pos() + newRect.topLeft() - rect().topLeft());
+        // mapToParent() is needed for rotated rectangles.
+        setPos(mapToParent(newRect.topLeft() - rect().topLeft()));
         newRect.translate(rect().topLeft() - newRect.topLeft());
 
         setRect(newRect);
