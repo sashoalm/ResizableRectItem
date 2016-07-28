@@ -20,16 +20,31 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     Q_ASSERT(!(resizeDirections.left && resizeDirections.right));
     Q_ASSERT(!(resizeDirections.top && resizeDirections.bottom));
+
+    // If not a resize event, pass it to base class so move event can be implemented.
+    if (!resizeDirections.any()) {
+        QGraphicsRectItem::mousePressEvent(event);
+    }
 }
 
 void ResizableRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    resizeRect(event);
+    // If not a resize event, pass it to base class so move event can be implemented.
+    if (!resizeDirections.any()) {
+        QGraphicsRectItem::mouseMoveEvent(event);
+    } else {
+        resizeRect(event);
+    }
 }
 
 void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    resizeRect(event);
+    // If not a resize event, pass it to base class so move event can be implemented.
+    if (!resizeDirections.any()) {
+        QGraphicsRectItem::mouseReleaseEvent(event);
+    } else {
+        resizeRect(event);
+    }
 }
 
 void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)

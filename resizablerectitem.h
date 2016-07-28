@@ -26,6 +26,7 @@ private:
 
     struct {
         bool left, top, right, bottom;
+        bool any() { return left || top || right || bottom; }
     } resizeDirections;
 
     void resizeRect(QGraphicsSceneMouseEvent *event);
