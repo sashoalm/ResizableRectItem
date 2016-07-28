@@ -13,8 +13,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    resizablerectitem.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    resizablerectitem.h
 
 FORMS    += mainwindow.ui
