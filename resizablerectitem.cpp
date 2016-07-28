@@ -72,28 +72,28 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 
     QPointF delta = event->pos() - event->lastPos();
     if (resizeDirections.left) {
-        qreal dx = qBound(rect().width() - maximumSize().width(),
+        delta.setX(qBound(rect().width() - maximumSize().width(),
                           delta.x(),
-                          rect().width() - minimumSize().width());
-        setPos(QPointF(pos().x() + dx, pos().y()));
-        setRect(rect().adjusted(0, 0, -dx, 0));
+                          rect().width() - minimumSize().width()));
+        setPos(QPointF(pos().x() + delta.x(), pos().y()));
+        setRect(rect().adjusted(0, 0, -delta.x(), 0));
     } else if (resizeDirections.right) {
-        qreal dx = qBound(minimumSize().width() - rect().width(),
+        delta.setX(qBound(minimumSize().width() - rect().width(),
                           delta.x(),
-                          maximumSize().width() - rect().width());
-        setRect(rect().adjusted(0, 0, dx, 0));
+                          maximumSize().width() - rect().width()));
+        setRect(rect().adjusted(0, 0, delta.x(), 0));
     }
 
     if (resizeDirections.top) {
-        qreal dy = qBound(rect().height() - maximumSize().height(),
+        delta.setY(qBound(rect().height() - maximumSize().height(),
                           delta.y(),
-                          rect().height() - minimumSize().height());
-        setPos(QPointF(pos().x(), pos().y()+dy));
-        setRect(rect().adjusted(0, 0, 0, -dy));
+                          rect().height() - minimumSize().height()));
+        setPos(QPointF(pos().x(), pos().y()+delta.y()));
+        setRect(rect().adjusted(0, 0, 0, -delta.y()));
     } else if (resizeDirections.bottom) {
-        qreal dy = qBound(minimumSize().height() - rect().height(),
+        delta.setY(qBound(minimumSize().height() - rect().height(),
                           delta.y(),
-                          maximumSize().height() - rect().height());
-        setRect(rect().adjusted(0, 0, 0, dy));
+                          maximumSize().height() - rect().height()));
+        setRect(rect().adjusted(0, 0, 0, delta.y()));
     }
 }
