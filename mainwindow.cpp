@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     item->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(item);
     item->setPos(100, 100);
+    new QGraphicsTextItem("Foo", item);
 }
 
 MainWindow::~MainWindow()

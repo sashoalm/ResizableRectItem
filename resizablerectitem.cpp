@@ -75,7 +75,8 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
         qreal dx = qBound(rect().width() - maximumSize().width(),
                           delta.x(),
                           rect().width() - minimumSize().width());
-        setRect(rect().adjusted(dx, 0, 0, 0));
+        setPos(QPointF(pos().x() + dx, pos().y()));
+        setRect(rect().adjusted(0, 0, -dx, 0));
     } else if (resizeDirections.right) {
         qreal dx = qBound(minimumSize().width() - rect().width(),
                           delta.x(),
@@ -87,7 +88,8 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
         qreal dy = qBound(rect().height() - maximumSize().height(),
                           delta.y(),
                           rect().height() - minimumSize().height());
-        setRect(rect().adjusted(0, dy, 0, 0));
+        setPos(QPointF(pos().x(), pos().y()+dy));
+        setRect(rect().adjusted(0, 0, 0, -dy));
     } else if (resizeDirections.bottom) {
         qreal dy = qBound(minimumSize().height() - rect().height(),
                           delta.y(),
