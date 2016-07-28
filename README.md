@@ -2,7 +2,11 @@
 
 This little class derives from QGraphicsRectItem and adds the capability to resize.
 
-It implements resizing by handling mouse clicks around the border, in the way that GIMP does. How much of the border is dedicated to resizing relative to the rect item's width and height can be adjusted by the user. Mouse events that are nearer to the center are passed to the base class implementation so flags like ItemIsMovable still work.
+It implements resizing by handling mouse clicks around the border, while the inner rect is for moving, in the way that GIMP does:
+
+![GIMP screenshot](gimp-select-area.png)
+
+How much of the border is dedicated to resizing relative to the rect item's width and height can be adjusted by the user. Mouse events that are nearer to the center are passed to the base class implementation so flags like ItemIsMovable still work.
 
 The test project shows a rectangle which can be moved and resized. There is also a child text item, which is used to highlight the fact that child items positions relative to the top-left corner of the rectangle are preserved.
 
