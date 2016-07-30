@@ -19,17 +19,18 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QRectF innerRect = rect().adjusted(widthPart, heightPart, -widthPart, -heightPart);
 
     // Get the resize-directions.
-    if (event->pos().x() < innerRect.left()) {
+    const QPointF &pos = event->pos();
+    if (pos.x() < innerRect.left()) {
         resizeDirections.horizontal = resizeDirections.Left;
-    } else if (event->pos().x() > innerRect.right()) {
+    } else if (pos.x() > innerRect.right()) {
         resizeDirections.horizontal = resizeDirections.Right;
     } else {
         resizeDirections.horizontal = resizeDirections.HorzNone;
     }
 
-    if (event->pos().y() < innerRect.top()) {
+    if (pos.y() < innerRect.top()) {
         resizeDirections.vertical = resizeDirections.Top;
-    } else if (event->pos().y() > innerRect.bottom()) {
+    } else if (pos.y() > innerRect.bottom()) {
         resizeDirections.vertical = resizeDirections.Bottom;
     } else {
         resizeDirections.vertical = resizeDirections.VertNone;
@@ -40,7 +41,7 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if (!resizeDirections.any()) {
         QGraphicsRectItem::mousePressEvent(event);
     } else {
-        lastResizePos = event->pos();
+        lastResizePos = pos;
     }
 }
 
