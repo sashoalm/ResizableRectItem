@@ -22,16 +22,20 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     const QPointF &pos = event->pos();
     if (pos.x() < innerRect.left()) {
         resizeDirections.horizontal = resizeDirections.Left;
+        horizontalDistance = rect().left() - pos.x();
     } else if (pos.x() > innerRect.right()) {
         resizeDirections.horizontal = resizeDirections.Right;
+        horizontalDistance = rect().right() - pos.x();
     } else {
         resizeDirections.horizontal = resizeDirections.HorzNone;
     }
 
     if (pos.y() < innerRect.top()) {
         resizeDirections.vertical = resizeDirections.Top;
+        verticalDistance = rect().top() - pos.y();
     } else if (pos.y() > innerRect.bottom()) {
         resizeDirections.vertical = resizeDirections.Bottom;
+        verticalDistance = rect().bottom() - pos.y();
     } else {
         resizeDirections.vertical = resizeDirections.VertNone;
     }
@@ -40,8 +44,6 @@ void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     // implemented.
     if (!resizeDirections.any()) {
         QGraphicsRectItem::mousePressEvent(event);
-    } else {
-        lastResizePos = pos;
     }
 }
 
@@ -67,72 +69,61 @@ void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 {
+    // I don't use QRectF because its members can't be manipulated
+    // directly.
+    qreal left = rect().left();
+    qreal top = rect().top();
+    qreal right = left + rect().width();
+    qreal bottom = top + rect().height();
+
     // The qBound() is used for enforcement of the minimum and maximum sizes.
     // It's derived after solving the following inequalities (example is for
     // left-resizing):
     //
-    // newWidth = oldWidth - deltaX (remember when adding +10 to the left border, the width decreases)
-    // minimumWidth <= newWidth <= maximumWidth
-    // minimumWidth <= oldWidth - deltaX <= maximumWidth
-    // minimumWidth - oldWidth <= (-deltaX) <= maximumWidth - oldWidth
-    // Reverting the sign reverts the inequality - if a<=b then -a>=-b:
-    // -(minimumWidth - oldWidth) >= -(-deltaX) >= -(maximumWidth - oldWidth)
-    // Which is equivalent to:
-    // oldWidth-maximumWidth <= deltaX <= oldWidth-minimumWidth
+    // minWidth <= newWidth <= maxWidth
+    // minWidth <= right-newLeft <= maxWidth
+    // minWidth-right <= -newLeft <= maxWidth-right
+    // right-minWidth >= newLeft >= right-maxWidth
     //
     // Ditto for the other 3 directions.
 
-    prepareGeometryChange();
-
-    QPointF delta = event->pos() - lastResizePos;
-    bool wasUpdated = false;
     if (resizeDirections.horizontal == resizeDirections.Left) {
-        delta.setX(qBound(rect().width() - maximumSize().width(),
-                          delta.x(),
-                          rect().width() - minimumSize().width()));
-        if (delta.x() != 0) {
-            setPos(QPointF(pos().x()+delta.x(), pos().y()));
-            setRect(rect().adjusted(0, 0, -delta.x(), 0));
-        }
+        left = event->pos().x() + horizontalDistance;
+        // Enforce minimum/maximum size.
+        left = qBound(right-maximumSize().width(), left, right-minimumSize().width());
     } else if (resizeDirections.horizontal == resizeDirections.Right) {
-        delta.setX(qBound(minimumSize().width() - rect().width(),
-                          delta.x(),
-                          maximumSize().width() - rect().width()));
-        if (delta.x() != 0) {
-            wasUpdated = true;
-            setRect(rect().adjusted(0, 0, delta.x(), 0));
-        }
-    } else {
-        // This is needed for lastResizePos to work correctly.
-        delta.setX(0);
+        right = event->pos().x() + horizontalDistance;
+        // Enforce minimum/maximum size.
+        right = qBound(minimumSize().width()+left, right, maximumSize().width()+left);
     }
 
     if (resizeDirections.vertical == resizeDirections.Top) {
-        delta.setY(qBound(rect().height() - maximumSize().height(),
-                          delta.y(),
-                          rect().height() - minimumSize().height()));
-        if (delta.y() != 0) {
-            setPos(QPointF(pos().x(), pos().y()+delta.y()));
-            setRect(rect().adjusted(0, 0, 0, -delta.y()));
-        }
+        top = event->pos().y() + verticalDistance;
+        // Enforce minimum/maximum size.
+        top = qBound(bottom-maximumSize().height(), top, bottom-minimumSize().height());
     } else if (resizeDirections.vertical == resizeDirections.Bottom) {
-        delta.setY(qBound(minimumSize().height() - rect().height(),
-                          delta.y(),
-                          maximumSize().height() - rect().height()));
-        if (delta.y() != 0) {
-            wasUpdated = true;
-            setRect(rect().adjusted(0, 0, 0, delta.y()));
-        }
-    } else {
-        // This is needed for lastResizePos to work correctly.
-        delta.setY(0);
+        bottom = event->pos().y() + verticalDistance;
+        // Enforce minimum/maximum size.
+        bottom = qBound(minimumSize().height()+top, bottom, maximumSize().height()+top);
     }
 
-    if (wasUpdated) {
-        // I'm using relative coordinates to move the last resize pos,
-        // though I could probably simplify things by just remembering
-        // the click-origin point, the original rect, and then using that
-        // to calculate how much to add to each side.
-        lastResizePos += delta;
+    QRectF newRect(left, top, right-left, bottom-top);
+    if (newRect != rect()) {
+        // The documentation states this function should be called prior to any changes
+        // in the geometry:
+        // Prepares the item for a geometry change. Call this function before
+        // changing the bounding rect of an item to keep QGraphicsScene's index
+        // up to date.
+        prepareGeometryChange();
+
+        // For top and left resizing, we move the item's position in the
+        // parent. This is because we want any child items it has to move along
+        // with it, preserving their distance relative to the top-left corner
+        // of the rectangle, because this is the most-expected behavior from a
+        // user's point of view.
+        setPos(pos() + newRect.topLeft() - rect().topLeft());
+        newRect.translate(rect().topLeft() - newRect.topLeft());
+
+        setRect(newRect);
     }
 }

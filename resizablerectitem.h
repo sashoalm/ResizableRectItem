@@ -34,18 +34,18 @@ private:
         bool any() { return horizontal || vertical; }
     } resizeDirections;
 
+    // Horizontal and vertical distance from the cursor position at the time of
+    // mouse-click to the nearest respective side of the rectangle. Whether
+    // it's left or right, and top or bottom, depends on which side we'll be
+    // resizing. We use that to calculate the rectangle from the mouse position
+    // during the mouse move events.
+    qreal horizontalDistance;
+    qreal verticalDistance;
+
     void resizeRect(QGraphicsSceneMouseEvent *event);
 
     QSizeF mMinimumSize;
     QSizeF mMaximumSize;
-
-    // The last position under which we actually resized. We use that to avoid
-    // the nasty effect where the cursor moves to the right, past the maximum
-    // size, the rect stops resizing, and then as soon as the cursor reverses
-    // direction to the left, the item starts shrinking.
-    // We want the mouse cursor to be always at the same distance from the
-    // side(s) which are being resized.
-    QPointF lastResizePos;
 };
 
 #endif // RESIZABLERECTITEM_H
