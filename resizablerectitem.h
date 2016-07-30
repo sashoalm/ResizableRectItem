@@ -29,8 +29,9 @@ private:
     qreal resizablePart;
 
     struct {
-        bool left, top, right, bottom;
-        bool any() { return left || top || right || bottom; }
+        enum { HorzNone, Left, Right } horizontal;
+        enum { VertNone, Top, Bottom } vertical;
+        bool any() { return horizontal || vertical; }
     } resizeDirections;
 
     void resizeRect(QGraphicsSceneMouseEvent *event);

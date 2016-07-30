@@ -13,19 +13,30 @@ ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart, QG
 
 void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Get the inner rect.
     qreal widthPart = resizablePart * rect().width() / 2;
     qreal heightPart = resizablePart * rect().height() / 2;
     QRectF innerRect = rect().adjusted(widthPart, heightPart, -widthPart, -heightPart);
 
-    resizeDirections.left = event->pos().x() < innerRect.left();
-    resizeDirections.right = event->pos().x() > innerRect.right();
-    resizeDirections.top = event->pos().y() < innerRect.top();
-    resizeDirections.bottom = event->pos().y() > innerRect.bottom();
+    // Get the resize-directions.
+    if (event->pos().x() < innerRect.left()) {
+        resizeDirections.horizontal = resizeDirections.Left;
+    } else if (event->pos().x() > innerRect.right()) {
+        resizeDirections.horizontal = resizeDirections.Right;
+    } else {
+        resizeDirections.horizontal = resizeDirections.HorzNone;
+    }
 
-    Q_ASSERT(!(resizeDirections.left && resizeDirections.right));
-    Q_ASSERT(!(resizeDirections.top && resizeDirections.bottom));
+    if (event->pos().y() < innerRect.top()) {
+        resizeDirections.vertical = resizeDirections.Top;
+    } else if (event->pos().y() > innerRect.bottom()) {
+        resizeDirections.vertical = resizeDirections.Bottom;
+    } else {
+        resizeDirections.vertical = resizeDirections.VertNone;
+    }
 
-    // If not a resize event, pass it to base class so move event can be implemented.
+    // If not a resize event, pass it to base class so the move-event can be
+    // implemented.
     if (!resizeDirections.any()) {
         QGraphicsRectItem::mousePressEvent(event);
     } else {
@@ -74,7 +85,7 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 
     QPointF delta = event->pos() - lastResizePos;
     bool wasUpdated = false;
-    if (resizeDirections.left) {
+    if (resizeDirections.horizontal == resizeDirections.Left) {
         delta.setX(qBound(rect().width() - maximumSize().width(),
                           delta.x(),
                           rect().width() - minimumSize().width()));
@@ -82,7 +93,7 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
             setPos(QPointF(pos().x()+delta.x(), pos().y()));
             setRect(rect().adjusted(0, 0, -delta.x(), 0));
         }
-    } else if (resizeDirections.right) {
+    } else if (resizeDirections.horizontal == resizeDirections.Right) {
         delta.setX(qBound(minimumSize().width() - rect().width(),
                           delta.x(),
                           maximumSize().width() - rect().width()));
@@ -95,7 +106,7 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
         delta.setX(0);
     }
 
-    if (resizeDirections.top) {
+    if (resizeDirections.vertical == resizeDirections.Top) {
         delta.setY(qBound(rect().height() - maximumSize().height(),
                           delta.y(),
                           rect().height() - minimumSize().height()));
@@ -103,7 +114,7 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
             setPos(QPointF(pos().x(), pos().y()+delta.y()));
             setRect(rect().adjusted(0, 0, 0, -delta.y()));
         }
-    } else if (resizeDirections.bottom) {
+    } else if (resizeDirections.vertical == resizeDirections.Bottom) {
         delta.setY(qBound(minimumSize().height() - rect().height(),
                           delta.y(),
                           maximumSize().height() - rect().height()));
