@@ -1,5 +1,6 @@
 #include "resizablerectitem.h"
 #include <QGraphicsSceneMouseEvent>
+#include <QPainter>
 
 static struct {
     enum { HorzNone, Left, Right } horizontal;
@@ -27,10 +28,7 @@ ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart, QG
 
 void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    // Get the inner rect.
-    qreal widthPart = resizablePart * rect().width() / 2;
-    qreal heightPart = resizablePart * rect().height() / 2;
-    QRectF innerRect = rect().adjusted(widthPart, heightPart, -widthPart, -heightPart);
+    QRectF innerRect = getInnerRect();
 
     // Get the resize-directions.
     const QPointF &pos = event->pos();
@@ -79,6 +77,23 @@ void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     } else {
         resizeRect(event);
     }
+}
+
+void ResizableRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    QPen old = painter->pen();
+    painter->setPen(Qt::DashLine);
+    painter->drawRect(getInnerRect());
+    painter->setPen(old);
+    QGraphicsRectItem::paint(painter, option, widget);
+}
+
+QRectF ResizableRectItem::getInnerRect() const
+{
+    // Get the inner rect.
+    qreal widthPart = resizablePart * rect().width() / 2;
+    qreal heightPart = resizablePart * rect().height() / 2;
+    return rect().adjusted(widthPart, heightPart, -widthPart, -heightPart);
 }
 
 void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)

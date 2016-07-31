@@ -17,6 +17,10 @@ private:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    QRectF getInnerRect() const;
+
     // How much of the border is dedicated to resizing. For example,
     // if we have rectangle (10,20,210,120) and resizablePart=0.15,
     // then the rect size is 200x100 pixels, and 15% of that is dedicated
