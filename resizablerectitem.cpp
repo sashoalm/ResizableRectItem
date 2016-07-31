@@ -1,6 +1,20 @@
 #include "resizablerectitem.h"
 #include <QGraphicsSceneMouseEvent>
 
+static struct {
+    enum { HorzNone, Left, Right } horizontal;
+    enum { VertNone, Top, Bottom } vertical;
+    bool any() { return horizontal || vertical; }
+} resizeDirections;
+
+// Horizontal and vertical distance from the cursor position at the time of
+// mouse-click to the nearest respective side of the rectangle. Whether
+// it's left or right, and top or bottom, depends on which side we'll be
+// resizing. We use that to calculate the rectangle from the mouse position
+// during the mouse move events.
+static qreal horizontalDistance;
+static qreal verticalDistance;
+
 ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart, QGraphicsItem *parent)
     : QGraphicsRectItem(rect, parent)
 {

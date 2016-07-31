@@ -28,20 +28,6 @@ private:
     // (10,20,210,120) will cause a resize event.
     qreal resizablePart;
 
-    struct {
-        enum { HorzNone, Left, Right } horizontal;
-        enum { VertNone, Top, Bottom } vertical;
-        bool any() { return horizontal || vertical; }
-    } resizeDirections;
-
-    // Horizontal and vertical distance from the cursor position at the time of
-    // mouse-click to the nearest respective side of the rectangle. Whether
-    // it's left or right, and top or bottom, depends on which side we'll be
-    // resizing. We use that to calculate the rectangle from the mouse position
-    // during the mouse move events.
-    qreal horizontalDistance;
-    qreal verticalDistance;
-
     void resizeRect(QGraphicsSceneMouseEvent *event);
 
     QSizeF mMinimumSize;
