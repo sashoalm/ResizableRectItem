@@ -22,7 +22,12 @@ ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart,
                                      QGraphicsItem *parent)
     : QGraphicsRectItem(rect, parent)
 {
-    this->resizablePart = resizablePart;
+    Q_ASSERT(minimumSize.width() == 0 || minimumSize.width() >= resizablePart);
+    Q_ASSERT(minimumSize.height() == 0 || minimumSize.height() >= resizablePart);
+    Q_ASSERT(maximumSize.width() >= resizablePart);
+    Q_ASSERT(maximumSize.height() >= resizablePart);
+
+    this->resizableBorderSize = resizablePart;
     this->minimumSize = minimumSize;
     this->maximumSize = maximumSize;
 }
@@ -91,10 +96,8 @@ void ResizableRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 QRectF ResizableRectItem::getInnerRect() const
 {
-    // Get the inner rect.
-    qreal widthPart = resizablePart * rect().width() / 2;
-    qreal heightPart = resizablePart * rect().height() / 2;
-    return rect().adjusted(widthPart, heightPart, -widthPart, -heightPart);
+    qreal a = resizableBorderSize;
+    return rect().adjusted(a, a, -a, -a);
 }
 
 void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
