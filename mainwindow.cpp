@@ -12,9 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setScene(scene);
     scene->setSceneRect(0, 0, 800, 600);
 
+    QBrush brush(QColor(255, 0, 0, 255/3));
+
     // Add item without rotation.
     ResizableRectItem *item = new ResizableRectItem(QRectF(QPointF(10, 20), QPointF(210, 120)),
-                                                    15, QSizeF(30, 30), QSizeF(200, 200));
+                                                    15, QSizeF(30, 30), QSizeF(200, 200),
+                                                    Qt::DashLine, brush);
+    item->setBrush(brush);
     item->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(item);
     item->setPos(100, 100);    
@@ -22,7 +26,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Add item with 45 degrees rotation.
     item = new ResizableRectItem(QRectF(QPointF(10, 20), QPointF(210, 120)),
-                                 15, QSizeF(30, 30), QSizeF(200, 200));
+                                 15, QSizeF(30, 30), QSizeF(200, 200), Qt::DotLine, brush);
+    item->setBrush(brush);
     item->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(item);
     item->setPos(100, 200);

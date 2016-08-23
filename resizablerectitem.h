@@ -2,6 +2,8 @@
 #define RESIZABLERECTITEM_H
 
 #include <QGraphicsRectItem>
+#include <QPen>
+#include <QBrush>
 
 class ResizableRectItem : public QGraphicsRectItem
 {
@@ -9,6 +11,8 @@ public:
     ResizableRectItem(const QRectF &rect, qreal resizablePart = 15,
                       const QSizeF &minimumSize = QSizeF(),
                       const QSizeF &maximumSize = QSizeF(1000000, 1000000),
+                      const QPen &innerRectPen = Qt::NoPen,
+                      const QBrush &innerRectBrush = Qt::NoBrush,
                       QGraphicsItem *parent = 0);
 
 
@@ -29,6 +33,9 @@ private:
 
     QSizeF minimumSize;
     QSizeF maximumSize;
+
+    QPen innerRectPen;
+    QBrush innerRectBrush;
 };
 
 #endif // RESIZABLERECTITEM_H

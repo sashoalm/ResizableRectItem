@@ -19,6 +19,7 @@ static qreal verticalDistance;
 ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart,
                                      const QSizeF &minimumSize,
                                      const QSizeF &maximumSize,
+                                     const QPen &innerRectPen, const QBrush &innerRectBrush,
                                      QGraphicsItem *parent)
     : QGraphicsRectItem(rect, parent)
 {
@@ -30,6 +31,8 @@ ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart,
     this->resizableBorderSize = resizablePart;
     this->minimumSize = minimumSize;
     this->maximumSize = maximumSize;
+    this->innerRectPen = innerRectPen;
+    this->innerRectBrush = innerRectBrush;
 }
 
 void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -87,11 +90,17 @@ void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void ResizableRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QPen old = painter->pen();
-    painter->setPen(Qt::DashLine);
-    painter->drawRect(getInnerRect());
-    painter->setPen(old);
     QGraphicsRectItem::paint(painter, option, widget);
+
+    // We draw the inner-rect after main rect.
+    // Drawing order matters if alpha-transparency is used.
+    const QPen &oldPen = painter->pen();
+    const QBrush &oldBrush = painter->brush();
+    painter->setPen(innerRectPen);
+    painter->setBrush(innerRectBrush);
+    painter->drawRect(getInnerRect());
+    painter->setPen(oldPen);
+    painter->setBrush(oldBrush);
 }
 
 QRectF ResizableRectItem::getInnerRect() const
