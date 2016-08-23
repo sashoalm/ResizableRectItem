@@ -13,18 +13,16 @@ MainWindow::MainWindow(QWidget *parent) :
     scene->setSceneRect(0, 0, 800, 600);
 
     // Add item without rotation.
-    ResizableRectItem *item = new ResizableRectItem(QRectF(QPointF(10, 20), QPointF(210, 120)), 0.15);
-    item->setMinimumSize(QSizeF(30, 30));
-    item->setMaximumSize(QSizeF(200, 200));
+    ResizableRectItem *item = new ResizableRectItem(QRectF(QPointF(10, 20), QPointF(210, 120)),
+                                                    0.15, QSizeF(30, 30), QSizeF(200, 200));
     item->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(item);
     item->setPos(100, 100);    
     new QGraphicsTextItem("Foo", item);
 
     // Add item with 45 degrees rotation.
-    item = new ResizableRectItem(QRectF(QPointF(10, 20), QPointF(210, 120)), 0.15);
-    item->setMinimumSize(QSizeF(30, 30));
-    item->setMaximumSize(QSizeF(200, 200));
+    item = new ResizableRectItem(QRectF(QPointF(10, 20), QPointF(210, 120)),
+                                 0.15, QSizeF(30, 30), QSizeF(200, 200));
     item->setFlag(QGraphicsItem::ItemIsMovable);
     scene->addItem(item);
     item->setPos(100, 200);

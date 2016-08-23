@@ -6,11 +6,11 @@
 class ResizableRectItem : public QGraphicsRectItem
 {
 public:
-    ResizableRectItem(const QRectF &rect, qreal resizablePart, QGraphicsItem *parent = 0);
-    void setMinimumSize(const QSizeF &size) { this->mMinimumSize = size; }
-    void setMaximumSize(const QSizeF &size) { this->mMaximumSize = size; }
-    QSizeF minimumSize() const { return mMinimumSize; }
-    QSizeF maximumSize() const { return mMaximumSize; }
+    ResizableRectItem(const QRectF &rect, qreal resizablePart,
+                      const QSizeF &minimumSize = QSizeF(),
+                      const QSizeF &maximumSize = QSizeF(1000000, 1000000),
+                      QGraphicsItem *parent = 0);
+
 
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -34,8 +34,8 @@ private:
 
     void resizeRect(QGraphicsSceneMouseEvent *event);
 
-    QSizeF mMinimumSize;
-    QSizeF mMaximumSize;
+    QSizeF minimumSize;
+    QSizeF maximumSize;
 };
 
 #endif // RESIZABLERECTITEM_H

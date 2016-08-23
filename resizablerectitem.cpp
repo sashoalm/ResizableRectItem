@@ -16,14 +16,15 @@ static struct {
 static qreal horizontalDistance;
 static qreal verticalDistance;
 
-ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart, QGraphicsItem *parent)
+ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart,
+                                     const QSizeF &minimumSize,
+                                     const QSizeF &maximumSize,
+                                     QGraphicsItem *parent)
     : QGraphicsRectItem(rect, parent)
 {
     this->resizablePart = resizablePart;
-
-    // Some big value for maximum size by default.
-    mMaximumSize.setWidth(1000000);
-    mMaximumSize.setHeight(1000000);
+    this->minimumSize = minimumSize;
+    this->maximumSize = maximumSize;
 }
 
 void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -119,21 +120,21 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
     if (resizeDirections.horizontal == resizeDirections.Left) {
         left = event->pos().x() + horizontalDistance;
         // Enforce minimum/maximum size.
-        left = qBound(right-maximumSize().width(), left, right-minimumSize().width());
+        left = qBound(right-maximumSize.width(), left, right-minimumSize.width());
     } else if (resizeDirections.horizontal == resizeDirections.Right) {
         right = event->pos().x() + horizontalDistance;
         // Enforce minimum/maximum size.
-        right = qBound(minimumSize().width()+left, right, maximumSize().width()+left);
+        right = qBound(minimumSize.width()+left, right, maximumSize.width()+left);
     }
 
     if (resizeDirections.vertical == resizeDirections.Top) {
         top = event->pos().y() + verticalDistance;
         // Enforce minimum/maximum size.
-        top = qBound(bottom-maximumSize().height(), top, bottom-minimumSize().height());
+        top = qBound(bottom-maximumSize.height(), top, bottom-minimumSize.height());
     } else if (resizeDirections.vertical == resizeDirections.Bottom) {
         bottom = event->pos().y() + verticalDistance;
         // Enforce minimum/maximum size.
-        bottom = qBound(minimumSize().height()+top, bottom, maximumSize().height()+top);
+        bottom = qBound(minimumSize.height()+top, bottom, maximumSize.height()+top);
     }
 
     QRectF newRect(left, top, right-left, bottom-top);
