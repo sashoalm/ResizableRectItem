@@ -16,18 +16,44 @@ static struct {
 static qreal horizontalDistance;
 static qreal verticalDistance;
 
-ResizableRectItem::ResizableRectItem(const QRectF &rect, qreal resizablePart,
-                                     const QSizeF &minimumSize,
-                                     const QSizeF &maximumSize,
+ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
+                                     QSizeF minimumSize,
+                                     QSizeF maximumSize,
                                      const QPen &innerRectPen, const QBrush &innerRectBrush,
                                      QGraphicsItem *parent)
     : QGraphicsRectItem(rect, parent)
 {
-    Q_ASSERT(minimumSize.width() == 0 || minimumSize.width() >= resizablePart);
-    Q_ASSERT(minimumSize.height() == 0 || minimumSize.height() >= resizablePart);
-    Q_ASSERT(maximumSize.width() >= resizablePart);
-    Q_ASSERT(maximumSize.height() >= resizablePart);
+    // Give some sensible defaults to empty min/max sizes.
+    if (minimumSize.isEmpty()) {
+        minimumSize = QSizeF(resizablePart, resizablePart);
+    }
+    if (maximumSize.isEmpty()) {
+        maximumSize = QSizeF(1000000, 1000000);
+    }
 
+    // Precondition: 0 <= resizablePart <= minimumSize <= rectSize <= maximumSize
+    Q_ASSERT(0 <= resizablePart);
+    // Check for width.
+    Q_ASSERT(resizablePart <= minimumSize.width());
+    Q_ASSERT(minimumSize.width() <= rect.width());
+    Q_ASSERT(rect.width() <= maximumSize.width());
+    // And now for height.
+    Q_ASSERT(resizablePart <= minimumSize.height());
+    Q_ASSERT(minimumSize.height() <= rect.height());
+    Q_ASSERT(rect.height() <= maximumSize.height());
+
+    // Behave well in Release builds as well.
+    resizablePart = qMax(0.0, resizablePart);
+    // For widths.
+    minimumSize.setWidth(qMax(resizablePart, minimumSize.width()));
+    rect.setWidth(qMax(minimumSize.width(), rect.width()));
+    maximumSize.setWidth(qMax(rect.width(), maximumSize.width()));
+    // And for heights.
+    minimumSize.setHeight(qMax(resizablePart, minimumSize.height()));
+    rect.setHeight(qMax(minimumSize.height(), rect.height()));
+    maximumSize.setHeight(qMax(rect.height(), maximumSize.height()));
+
+    // After all has been validated, assign the variables.
     this->resizableBorderSize = resizablePart;
     this->minimumSize = minimumSize;
     this->maximumSize = maximumSize;

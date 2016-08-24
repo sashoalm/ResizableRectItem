@@ -8,9 +8,9 @@
 class ResizableRectItem : public QGraphicsRectItem
 {
 public:
-    ResizableRectItem(const QRectF &rect, qreal resizablePart = 15,
-                      const QSizeF &minimumSize = QSizeF(),
-                      const QSizeF &maximumSize = QSizeF(1000000, 1000000),
+    ResizableRectItem(QRectF rect, qreal resizablePart = 15,
+                      QSizeF minimumSize = QSizeF(),
+                      QSizeF maximumSize = QSizeF(),
                       const QPen &innerRectPen = Qt::NoPen,
                       const QBrush &innerRectBrush = Qt::NoBrush,
                       QGraphicsItem *parent = 0);
