@@ -21,7 +21,7 @@ ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
                                      QSizeF maximumSize,
                                      const QPen &innerRectPen, const QBrush &innerRectBrush,
                                      QGraphicsItem *parent)
-    : QGraphicsRectItem(rect, parent)
+    : QGraphicsRectItem(parent)
 {
     // Give some sensible defaults to empty min/max sizes.
     if (minimumSize.isEmpty()) {
@@ -54,6 +54,7 @@ ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
     maximumSize.setHeight(qMax(rect.height(), maximumSize.height()));
 
     // After all has been validated, assign the variables.
+    this->setRect(rect);
     this->resizableBorderSize = resizablePart;
     this->minimumSize = minimumSize;
     this->maximumSize = maximumSize;
