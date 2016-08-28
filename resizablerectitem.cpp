@@ -114,6 +114,7 @@ void ResizableRectItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsRectItem::mouseReleaseEvent(event);
     } else {
         resizeRect(event);
+        PyScripting::runScript(this);
     }
 }
 
