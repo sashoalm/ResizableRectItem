@@ -2,11 +2,19 @@
 #include "resizablerectitem.h"
 #include "ui_mainwindow.h"
 
+
+MainWindow *wnd = 0;
+QString getPythonCode()
+{
+    return wnd->getPythonCode();
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    wnd = this;
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -40,4 +48,9 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+QString MainWindow::getPythonCode()
+{
+    return ui->plainTextEdit->toPlainText();
 }

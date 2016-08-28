@@ -20,3 +20,6 @@ HEADERS  += mainwindow.h \
     resizablerectitem.h
 
 FORMS    += mainwindow.ui
+
+INCLUDEPATH += "/usr/include/python2.7"
+LIBS += -lpython2.7

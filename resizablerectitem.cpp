@@ -102,6 +102,7 @@ void ResizableRectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         QGraphicsRectItem::mouseMoveEvent(event);
     } else {
         resizeRect(event);
+        setColor();
     }
 }
 
@@ -196,4 +197,37 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 
         setRect(newRect);
     }
+}
+
+#include <Python.h>
+
+static bool initialized = false;
+static ResizableRectItem *pthis;
+PyObject* setColorCallback(PyObject *self, PyObject *args)
+{
+    Q_UNUSED(self);
+    int a, r, g, b;
+    PyArg_ParseTuple(args, "iiii", &r, &g, &b, &a);
+    pthis->setBrush(QColor(r, g, b, a));
+    Py_RETURN_NONE;
+}
+
+static PyMethodDef methods[] = {
+    { "setColor", setColorCallback, METH_VARARGS, "set the color of the current rect item" },
+    { 0, 0, 0, 0 }
+};
+
+extern QString getPythonCode();
+
+void ResizableRectItem::setColor()
+{
+    if (!initialized) {
+        Py_Initialize();
+        initialized = true;
+        Py_InitModule("rectitem", methods);
+        PyRun_SimpleString("import rectitem\n");
+    }
+
+    pthis = this;
+    PyRun_SimpleString(getPythonCode().toUtf8().data());
 }

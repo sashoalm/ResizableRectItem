@@ -15,7 +15,6 @@ public:
                       const QBrush &innerRectBrush = Qt::NoBrush,
                       QGraphicsItem *parent = 0);
 
-
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -36,6 +35,8 @@ private:
 
     QPen innerRectPen;
     QBrush innerRectBrush;
+
+    void setColor();
 };
 
 #endif // RESIZABLERECTITEM_H
