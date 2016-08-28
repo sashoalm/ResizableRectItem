@@ -15,6 +15,8 @@ public:
                       const QBrush &innerRectBrush = Qt::NoBrush,
                       QGraphicsItem *parent = 0);
 
+    static void setPythonCode(const QString &code);
+
 private:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);

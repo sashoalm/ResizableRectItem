@@ -2,19 +2,17 @@
 #include "resizablerectitem.h"
 #include "ui_mainwindow.h"
 
-
-MainWindow *wnd = 0;
-QString getPythonCode()
-{
-    return wnd->getPythonCode();
-}
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    wnd = this;
+
+    QSettings settings;
+    ui->plainTextEdit->setPlainText(settings.value("python/code").toString());
+    ResizableRectItem::setPythonCode(ui->plainTextEdit->toPlainText());
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -47,10 +45,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    QSettings settings;
+    settings.setValue("python/code", ui->plainTextEdit->toPlainText());
     delete ui;
 }
 
-QString MainWindow::getPythonCode()
+void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    return ui->plainTextEdit->toPlainText();
+    if (index == 0) {
+        ResizableRectItem::setPythonCode(ui->plainTextEdit->toPlainText());
+    }
 }

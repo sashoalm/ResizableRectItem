@@ -62,6 +62,13 @@ ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
     this->innerRectBrush = innerRectBrush;
 }
 
+static QString pythonCode;
+
+void ResizableRectItem::setPythonCode(const QString &code)
+{
+    pythonCode = code;
+}
+
 void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QRectF innerRect = getInnerRect();
@@ -217,8 +224,6 @@ static PyMethodDef methods[] = {
     { 0, 0, 0, 0 }
 };
 
-extern QString getPythonCode();
-
 void ResizableRectItem::setColor()
 {
     if (!initialized) {
@@ -229,5 +234,5 @@ void ResizableRectItem::setColor()
     }
 
     pthis = this;
-    PyRun_SimpleString(getPythonCode().toUtf8().data());
+    PyRun_SimpleString(pythonCode.toUtf8().data());
 }

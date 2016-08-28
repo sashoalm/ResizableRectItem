@@ -14,7 +14,9 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QString getPythonCode();
+
+private slots:
+    void on_tabWidget_currentChanged(int index);
 
 private:
     Ui::MainWindow *ui;
