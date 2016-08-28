@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    resizablerectitem.cpp
+    resizablerectitem.cpp \
+    pyscripting.cpp
 
 HEADERS  += mainwindow.h \
-    resizablerectitem.h
+    resizablerectitem.h \
+    pyscripting.h
 
 FORMS    += mainwindow.ui
 

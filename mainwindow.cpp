@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "pyscripting.h"
 #include "resizablerectitem.h"
 #include "ui_mainwindow.h"
 
@@ -12,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QSettings settings;
     ui->plainTextEdit->setPlainText(settings.value("python/code").toString());
-    ResizableRectItem::setPythonCode(ui->plainTextEdit->toPlainText());
+    PyScripting::setScript(ui->plainTextEdit->toPlainText());
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -53,6 +54,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     if (index == 0) {
-        ResizableRectItem::setPythonCode(ui->plainTextEdit->toPlainText());
+        PyScripting::setScript(ui->plainTextEdit->toPlainText());
     }
 }
