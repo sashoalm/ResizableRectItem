@@ -248,8 +248,8 @@ void ResizableRectItem::setColor()
     if (!initialized) {
         Py_Initialize();
         initialized = true;
-        Py_InitModule("rectitem", methods);
-        PyRun_SimpleString("import rectitem\n");
+        Py_InitModule("item", methods);
+        PyRun_SimpleString("import item\n");
     }
 
     pthis = this;
