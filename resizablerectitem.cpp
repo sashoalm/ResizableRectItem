@@ -239,7 +239,7 @@ static PyObject* getPosCallback(PyObject *self, PyObject *args)
 static PyMethodDef methods[] = {
     { "setColor", setColorCallback, METH_VARARGS, "set the color of the current rect item" },
     { "setPos", setPosCallback, METH_VARARGS, "set the position of the current rect item" },
-    { "getPos", getPosCallback, METH_NOARGS, "get the position of the current rect item" },
+    { "pos", getPosCallback, METH_NOARGS, "get the position of the current rect item" },
     { 0, 0, 0, 0 }
 };
 
