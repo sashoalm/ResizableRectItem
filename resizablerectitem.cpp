@@ -210,7 +210,7 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
 
 static bool initialized = false;
 static ResizableRectItem *pthis;
-PyObject* setColorCallback(PyObject *self, PyObject *args)
+static PyObject* setColorCallback(PyObject *self, PyObject *args)
 {
     Q_UNUSED(self);
     int a, r, g, b;
@@ -219,8 +219,27 @@ PyObject* setColorCallback(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static PyObject* setPosCallback(PyObject *self, PyObject *args)
+{
+    Q_UNUSED(self);
+    double x, y;
+    PyArg_ParseTuple(args, "dd", &x, &y);
+    pthis->setPos(x, y);
+    Py_RETURN_NONE;
+}
+
+static PyObject* getPosCallback(PyObject *self, PyObject *args)
+{
+    Q_UNUSED(self);
+    Q_UNUSED(args);
+    QPointF pos = pthis->pos();
+    return Py_BuildValue("dd", pos.x(), pos.y());
+}
+
 static PyMethodDef methods[] = {
     { "setColor", setColorCallback, METH_VARARGS, "set the color of the current rect item" },
+    { "setPos", setPosCallback, METH_VARARGS, "set the position of the current rect item" },
+    { "getPos", getPosCallback, METH_NOARGS, "get the position of the current rect item" },
     { 0, 0, 0, 0 }
 };
 
