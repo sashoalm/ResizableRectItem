@@ -32,9 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     scene->addItem(item);
     item->setPos(100, 200);
     new QGraphicsTextItem("Foo", item);
-    QTransform transform;
-    transform.rotate(45);
-    item->setTransform(transform);
+    item->setTransform(QTransform().rotate(45));
 }
 
 MainWindow::~MainWindow()
