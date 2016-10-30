@@ -19,6 +19,7 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     resizablerectitem.h \
-    resizablerectitemsettings.h
+    resizablerectitemsettings.h \
+    resizedirections.h
 
 FORMS    += mainwindow.ui

@@ -5,6 +5,8 @@
 #include <QPen>
 #include <QBrush>
 
+class ResizeDirections;
+
 class ResizableRectItemSettings
 {
 public:
@@ -14,15 +16,18 @@ public:
                               const QPen &innerRectPen = Qt::NoPen,
                               const QBrush &innerRectBrush = Qt::NoBrush);
 
+    void validateRect(QRectF *r, const ResizeDirections &resizeDirections) const;
+
     // How much of the left, right, top and bottom border is dedicated to
     // resizing, in pixels.
     qreal resizableBorderSize;
 
-    QSizeF minimumSize;
-    QSizeF maximumSize;
-
     QPen innerRectPen;
     QBrush innerRectBrush;
+
+private:
+    QSizeF minimumSize;
+    QSizeF maximumSize;
 };
 
 #endif // RESIZABLERECTITEMSETTINGS_H

@@ -1,13 +1,10 @@
 #include "resizablerectitem.h"
 #include "resizablerectitemsettings.h"
+#include "resizedirections.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
-static struct {
-    enum { HorzNone, Left, Right } horizontal;
-    enum { VertNone, Top, Bottom } vertical;
-    bool any() { return horizontal || vertical; }
-} resizeDirections;
+static ResizeDirections resizeDirections;
 
 // Horizontal and vertical distance from the cursor position at the time of
 // mouse-click to the nearest respective side of the rectangle. Whether
@@ -107,41 +104,21 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
     qreal right = left + rect().width();
     qreal bottom = top + rect().height();
 
-    const QSizeF &minimumSize = settings->minimumSize;
-    const QSizeF &maximumSize = settings->maximumSize;
-
-    // The qBound() is used for enforcement of the minimum and maximum sizes.
-    // It's derived after solving the following inequalities (example is for
-    // left-resizing):
-    //
-    // minWidth <= newWidth <= maxWidth
-    // minWidth <= right-newLeft <= maxWidth
-    // minWidth-right <= -newLeft <= maxWidth-right
-    // right-minWidth >= newLeft >= right-maxWidth
-    //
-    // Ditto for the other 3 directions.
-
     if (resizeDirections.horizontal == resizeDirections.Left) {
         left = event->pos().x() + horizontalDistance;
-        // Enforce minimum/maximum size.
-        left = qBound(right-maximumSize.width(), left, right-minimumSize.width());
     } else if (resizeDirections.horizontal == resizeDirections.Right) {
         right = event->pos().x() + horizontalDistance;
-        // Enforce minimum/maximum size.
-        right = qBound(minimumSize.width()+left, right, maximumSize.width()+left);
     }
 
     if (resizeDirections.vertical == resizeDirections.Top) {
         top = event->pos().y() + verticalDistance;
-        // Enforce minimum/maximum size.
-        top = qBound(bottom-maximumSize.height(), top, bottom-minimumSize.height());
     } else if (resizeDirections.vertical == resizeDirections.Bottom) {
         bottom = event->pos().y() + verticalDistance;
-        // Enforce minimum/maximum size.
-        bottom = qBound(minimumSize.height()+top, bottom, maximumSize.height()+top);
     }
 
     QRectF newRect(left, top, right-left, bottom-top);
+    settings->validateRect(&newRect, resizeDirections);
+
     if (newRect != rect()) {
         // The documentation states this function should be called prior to any changes
         // in the geometry:
