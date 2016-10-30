@@ -16,6 +16,27 @@ static struct {
 static qreal horizontalDistance;
 static qreal verticalDistance;
 
+void ensureAscending(const qreal &a, qreal *b)
+{
+    Q_ASSERT(a <= *b);
+    if (a > *b) {
+        *b = a;
+    }
+}
+
+void ensureAscending(const QSizeF &a, QSizeF *b)
+{
+    ensureAscending(a.width(), &b->rwidth());
+    ensureAscending(a.height(), &b->rheight());
+}
+
+void ensureAscending(const QSizeF &a, QRectF *b)
+{
+    QSizeF s = b->size();
+    ensureAscending(a, &s);
+    b->setSize(s);
+}
+
 ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
                                      QSizeF minimumSize,
                                      QSizeF maximumSize,
@@ -31,27 +52,10 @@ ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
         maximumSize = QSizeF(1000000, 1000000);
     }
 
-    // Precondition: 0 <= resizablePart <= minimumSize <= rectSize <= maximumSize
-    Q_ASSERT(0 <= resizablePart);
-    // Check for width.
-    Q_ASSERT(resizablePart <= minimumSize.width());
-    Q_ASSERT(minimumSize.width() <= rect.width());
-    Q_ASSERT(rect.width() <= maximumSize.width());
-    // And now for height.
-    Q_ASSERT(resizablePart <= minimumSize.height());
-    Q_ASSERT(minimumSize.height() <= rect.height());
-    Q_ASSERT(rect.height() <= maximumSize.height());
-
-    // Behave well in Release builds as well.
-    resizablePart = qMax(0.0, resizablePart);
-    // For widths.
-    minimumSize.setWidth(qMax(resizablePart, minimumSize.width()));
-    rect.setWidth(qMax(minimumSize.width(), rect.width()));
-    maximumSize.setWidth(qMax(rect.width(), maximumSize.width()));
-    // And for heights.
-    minimumSize.setHeight(qMax(resizablePart, minimumSize.height()));
-    rect.setHeight(qMax(minimumSize.height(), rect.height()));
-    maximumSize.setHeight(qMax(rect.height(), maximumSize.height()));
+    ensureAscending(0, &resizablePart);
+    ensureAscending(QSizeF(resizablePart, resizablePart), &minimumSize);
+    ensureAscending(minimumSize, &rect);
+    ensureAscending(rect.size(), &maximumSize);
 
     // After all has been validated, assign the variables.
     this->setRect(rect);
