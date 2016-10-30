@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    resizablerectitem.cpp
+    resizablerectitem.cpp \
+    resizablerectitemsettings.cpp
 
 HEADERS  += mainwindow.h \
-    resizablerectitem.h
+    resizablerectitem.h \
+    resizablerectitemsettings.h
 
 FORMS    += mainwindow.ui

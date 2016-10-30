@@ -1,4 +1,5 @@
 #include "resizablerectitem.h"
+#include "resizablerectitemsettings.h"
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
@@ -16,54 +17,11 @@ static struct {
 static qreal horizontalDistance;
 static qreal verticalDistance;
 
-void ensureAscending(const qreal &a, qreal *b)
-{
-    Q_ASSERT(a <= *b);
-    if (a > *b) {
-        *b = a;
-    }
-}
-
-void ensureAscending(const QSizeF &a, QSizeF *b)
-{
-    ensureAscending(a.width(), &b->rwidth());
-    ensureAscending(a.height(), &b->rheight());
-}
-
-void ensureAscending(const QSizeF &a, QRectF *b)
-{
-    QSizeF s = b->size();
-    ensureAscending(a, &s);
-    b->setSize(s);
-}
-
-ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
-                                     QSizeF minimumSize,
-                                     QSizeF maximumSize,
-                                     const QPen &innerRectPen, const QBrush &innerRectBrush,
-                                     QGraphicsItem *parent)
+ResizableRectItem::ResizableRectItem(QRectF rect, const ResizableRectItemSettings *settings, QGraphicsItem *parent)
     : QGraphicsRectItem(parent)
 {
-    // Give some sensible defaults to empty min/max sizes.
-    if (minimumSize.isEmpty()) {
-        minimumSize = QSizeF(resizablePart, resizablePart);
-    }
-    if (maximumSize.isEmpty()) {
-        maximumSize = QSizeF(1000000, 1000000);
-    }
-
-    ensureAscending(0, &resizablePart);
-    ensureAscending(QSizeF(2*resizablePart, 2*resizablePart), &minimumSize);
-    ensureAscending(minimumSize, &rect);
-    ensureAscending(rect.size(), &maximumSize);
-
-    // After all has been validated, assign the variables.
+    this->settings = settings;
     this->setRect(rect);
-    this->resizableBorderSize = resizablePart;
-    this->minimumSize = minimumSize;
-    this->maximumSize = maximumSize;
-    this->innerRectPen = innerRectPen;
-    this->innerRectBrush = innerRectBrush;
 }
 
 void ResizableRectItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -127,8 +85,8 @@ void ResizableRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     // Drawing order matters if alpha-transparency is used.
     const QPen &oldPen = painter->pen();
     const QBrush &oldBrush = painter->brush();
-    painter->setPen(innerRectPen);
-    painter->setBrush(innerRectBrush);
+    painter->setPen(settings->innerRectPen);
+    painter->setBrush(settings->innerRectBrush);
     painter->drawRect(getInnerRect());
     painter->setPen(oldPen);
     painter->setBrush(oldBrush);
@@ -136,7 +94,7 @@ void ResizableRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
 QRectF ResizableRectItem::getInnerRect() const
 {
-    qreal a = resizableBorderSize;
+    qreal a = settings->resizableBorderSize;
     return rect().adjusted(a, a, -a, -a);
 }
 
@@ -148,6 +106,9 @@ void ResizableRectItem::resizeRect(QGraphicsSceneMouseEvent *event)
     qreal top = rect().top();
     qreal right = left + rect().width();
     qreal bottom = top + rect().height();
+
+    const QSizeF &minimumSize = settings->minimumSize;
+    const QSizeF &maximumSize = settings->maximumSize;
 
     // The qBound() is used for enforcement of the minimum and maximum sizes.
     // It's derived after solving the following inequalities (example is for
