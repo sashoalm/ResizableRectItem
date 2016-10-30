@@ -53,7 +53,7 @@ ResizableRectItem::ResizableRectItem(QRectF rect, qreal resizablePart,
     }
 
     ensureAscending(0, &resizablePart);
-    ensureAscending(QSizeF(resizablePart, resizablePart), &minimumSize);
+    ensureAscending(QSizeF(2*resizablePart, 2*resizablePart), &minimumSize);
     ensureAscending(minimumSize, &rect);
     ensureAscending(rect.size(), &maximumSize);
 
